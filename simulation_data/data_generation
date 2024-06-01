@@ -1,0 +1,69 @@
+#!/bin/bash
+
+# Ensure necessary tools are installed
+if ! command -v top &> /dev/null; then
+  echo "top command not found. Please install it."
+  exit 1
+fi
+
+# Function to check CPU and memory usage
+check_cpu_and_memory_usage() {
+  # Get the CPU and memory usage statistics
+  top_output=$(top -b -n2 -d0.5 | grep "Cpu(s)\|Mem")
+  cpu_idle=$(echo "$top_output" | grep "Cpu(s)" | tail -n1 | awk '{print $8}')
+  mem_usage=$(echo "$top_output" | grep "Mem" | tail -n1 | awk '{print $8}')
+  cpu_usage=$(echo "100 - $cpu_idle" | bc)
+  
+  # Calculate memory usage percentage
+  total_memory=$(free | grep Mem | awk '{print $2}')
+  used_memory=$(free | grep Mem | awk '{print $3}')
+  mem_percentage=$(echo "scale=2; $used_memory/$total_memory*100" | bc)
+
+  echo "Current CPU usage: $cpu_usage%"
+  echo "Current memory usage: $mem_percentage%"
+
+  if (( $(echo "$cpu_usage < 70" | bc -l) )) && (( $(echo "$mem_percentage < 80" | bc -l) )); then
+    return 0  # CPU usage is below 70% and memory usage is below 80%
+  else
+    return 1  # CPU usage is 70% or higher or memory usage is 80% or higher
+  fi
+}
+
+# Iterate over a specified range of cases
+for i in {21..99}; do  # Replace 1..10 with the actual range of cases
+  case_name="case_$i"
+
+  # Step 1: Copy the refCase folder to case_i
+  cp -r refCase "$case_name"
+  echo "Copied refCase to $case_name"
+
+  # Step 2: Copy points_i to case_i/constant/polyMesh/points
+  cp "../mesh_data/points_$i" "$case_name/constant/polyMesh/points"
+  echo "Copied points_$i to $case_name/constant/polyMesh/points"
+
+  # Rename refCase.foam to case_i.foam
+  mv "$case_name/refCase.foam" "$case_name/$case_name.foam"
+  echo "Renamed refCase.foam to $case_name.foam in $case_name"
+
+  # Step 3: Run checkMesh command in case_i
+  (cd "$case_name" && checkMesh > checkMeshOutput.txt)
+
+  # Check the output of checkMesh
+  if grep -q "Mesh OK." "$case_name/checkMeshOutput.txt"; then
+    echo "Mesh OK for $case_name"
+
+    # Check CPU and memory usage, then run icoFoam if conditions are met
+    while true; do
+      if check_cpu_and_memory_usage; then
+        echo "CPU usage is below 70% and memory usage is below 80%, running icoFoam in $case_name"
+        (cd "$case_name" && foamJob icoFoam)
+        break
+      else
+        echo "CPU or memory usage is too high, waiting..."
+        sleep 60  # Wait for 10 seconds before checking again
+      fi
+    done
+  else
+    echo "!!!!! Mesh not OK for $case_name, moving to next iteration !!!!!"
+  fi
+done

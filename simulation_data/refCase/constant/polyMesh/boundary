@@ -1,0 +1,82 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2306                                  |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    arch        "LSB;label=32;scalar=64";
+    class       polyBoundaryMesh;
+    location    "constant/polyMesh";
+    object      boundary;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+7
+(
+    velocity_inlet
+    {
+        type            patch;
+        nFaces          44;
+        startFace       10140;
+    }
+    pressure_outlet
+    {
+        type            patch;
+        nFaces          44;
+        startFace       10184;
+    }
+    wall_rod
+    {
+        type            wall;
+        inGroups        1(wall);
+        nFaces          192;
+        startFace       10228;
+    }
+    periodic_up
+    {
+        type            cyclic;
+        inGroups        1(cyclic);
+        nFaces          88;
+        startFace       10420;
+        matchTolerance  0.005;
+        transform       unknown;
+        neighbourPatch  periodic_down;
+    }
+    periodic_down
+    {
+        type            cyclic;
+        inGroups        1(cyclic);
+        nFaces          88;
+        startFace       10508;
+        matchTolerance  0.005;
+        transform       unknown;
+        neighbourPatch  periodic_up;
+    }
+    top
+    {
+        type            cyclic;
+        inGroups        1(cyclic);
+        nFaces          5184;
+        startFace       10596;
+        matchTolerance  0.001;
+        transform       unknown;
+        neighbourPatch  bottom;
+    }
+    bottom
+    {
+        type            cyclic;
+        inGroups        1(cyclic);
+        nFaces          5184;
+        startFace       15780;
+        matchTolerance  0.001;
+        transform       unknown;
+        neighbourPatch  top;
+    }
+)
+
+// ************************************************************************* //
