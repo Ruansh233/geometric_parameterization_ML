@@ -8,7 +8,7 @@ You can follow the steps to run the case:
 3. data_preprocessing.ipynb
 4. The three **AE** code are still under programming.
 
-The simulation are carried out by OpenFOAM v2306.
-It is recommended to using conda to manage the python packages used in the case.
+The simulations are carried out by OpenFOAM v2306.
+It is recommended to use conda to manage the Python packages used in the case.
 The required packages are listed in the file ___package-list.txt___. You can install it by running: 
 > conda create --name <env> --file <this file>
