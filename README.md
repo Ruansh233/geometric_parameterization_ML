@@ -11,8 +11,8 @@ You can follow the steps to run the case:
   <li>data_preprocessing.ipynb</li>
   <li>prediction
     <ol>
-      <li>EZyRB_PODI.ipynb or PODI.ipynb
-      <li>The three <strong>AE</strong> codes are still under programming.
+      <li>EZyRB_PODI_RBF.ipynb, EZyRB_PODI_GPR.ipynb and EZyRB_PODI_ANN.ipynb. The three techniques are utilized to interpolate the POD coefficients.
+      <li>EZyRB_AE_RBF.ipynb, EZyRB_AE_GPR.ipynb and EZyRB_AE_ANN.ipynb. The three techniques are utilized to interpolate the latent space coordinates. 
     </ol>
   </li>
 </ol>
